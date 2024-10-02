@@ -27,4 +27,7 @@ Este repositório trata sobre a matéria de LABECA durante o período de 2024.2 
    1. Projeto
    2. Simulação
    3. Implementação utilizando Arduino + SIMULINK
-6. 
+
+## Implementação
+
+Os scripts são divididos em funções 'get' e 'ploter', ambas podem receber como argumento 'filename' para definir os dados no sobre o qual serão computados os comandos.
