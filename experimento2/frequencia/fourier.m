@@ -1,9 +1,23 @@
-function [gjw_abs] = fourier(t,ut,yt,n_harm)
+function [gjw_abs] = fourier(n_harm)
 
+    % Criar um For para rodar todas as frequências coletadas e encontrar as
+    % harmonicas de cada frequencia 
+    % 3 vetores: 1 para os ganhos, 1 para as fases e 1 para as
+    % frequências naturais de cada frequência
+
+    % Carregar o arquivo CSV
+    data = readtable('carolina_dados.CSV');
+    data = table2array(data);
+    vt = data(:,3);
+    va = data(:,2);
+    t = data(:,1);
+
+  
     % numero de pontos
     p = length(t)-1;
     % intervalo de amostragem
-    h = 0.001;
+    h = diff(t);
+    h = h(1);
 
     T = p*h;
 
@@ -19,8 +33,8 @@ function [gjw_abs] = fourier(t,ut,yt,n_harm)
     c_ut(1) = [a_0_ut];
     c_yt(1) = [a_0_yt];
 
-    %phi_ut = zeros(1,N);
-    %phi_yt = zeros(1,N);
+    phi_ut = zeros(1,N);
+    phi_yt = zeros(1,N);
 
     
     for n = 1:N
@@ -36,11 +50,12 @@ function [gjw_abs] = fourier(t,ut,yt,n_harm)
         c_ut(n+1) = abs(zn_ut);
         c_yt(n+1) = abs(zn_yt);
 
-        %phi_ut(n) = angle(zn_ut);
-        %phi_yt(n) = angle(zn_yt);
+        phi_ut(n) = angle(zn_ut);
+        phi_yt(n) = angle(zn_yt);
 
     end
 
-    gjw_abs = c_yt./c_ut;
+    %gjw_abs = c_yt./c_ut;
+    
 
 end
