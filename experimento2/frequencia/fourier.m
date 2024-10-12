@@ -1,6 +1,5 @@
-function [gjw_abs, gjw_phi] = fourier(n_harm, t_lower, t_upper, path)
+function [gjw_abs, gjw_phi] = fourier(n_harm, va, vt, t)
 
-    clc
 
     % Criar um For para rodar todas as frequências coletadas e encontrar as
     % harmonicas de cada frequencia 
@@ -8,20 +7,20 @@ function [gjw_abs, gjw_phi] = fourier(n_harm, t_lower, t_upper, path)
     % frequências naturais de cada frequência
 
     % Carregar o arquivo CSV
-    data = readtable(path);
-    data = table2array(data);
-    vt = data(:,3);
-    va = data(:,2);
-    t = data(:,1);
+    %data = readtable(path);
+    %data = table2array(data);
+    %vt = data(:,3);
+    %va = data(:,2);
+    %t = data(:,1);
 
     % Intervalo antes do inicio do sinal
-    ids_lower = find(t>t_lower);
-    ids_upper = find(t<t_upper);
-    ids = intersect(ids_lower, ids_upper);
+    %ids_lower = find(t>t_lower);
+    %ids_upper = find(t<t_upper);
+    %ids = intersect(ids_lower, ids_upper);
     
-    va = va(ids);
-    vt = vt(ids);
-    t = t(ids);
+    %va = va(ids);
+    %vt = vt(ids);
+    %t = t(ids);
 
   
     % numero de pontos
