@@ -1,4 +1,6 @@
-function [gjw_abs] = fourier(n_harm)
+function [gjw_abs, gjw_phi] = fourier(n_harm, t_lower, t_upper, path)
+
+    clc
 
     % Criar um For para rodar todas as frequências coletadas e encontrar as
     % harmonicas de cada frequencia 
@@ -6,56 +8,65 @@ function [gjw_abs] = fourier(n_harm)
     % frequências naturais de cada frequência
 
     % Carregar o arquivo CSV
-    data = readtable('carolina_dados.CSV');
+    data = readtable(path);
     data = table2array(data);
     vt = data(:,3);
     va = data(:,2);
     t = data(:,1);
 
+    % Intervalo antes do inicio do sinal
+    ids_lower = find(t>t_lower);
+    ids_upper = find(t<t_upper);
+    ids = intersect(ids_lower, ids_upper);
+    
+    va = va(ids);
+    vt = vt(ids);
+    t = t(ids);
+
   
     % numero de pontos
     p = length(t)-1;
+
     % intervalo de amostragem
-    h = diff(t);
-    h = h(1);
+    h = mean(diff(t));
 
     T = p*h;
 
-    a_0_ut = trapz(t,ut)/T;
-    a_0_yt = trapz(t,yt)/T;
+    a_0_va = trapz(t,va)/T;
+    a_0_vt = trapz(t,vt)/T;
 
     % Quantidade de Harmônicos desejada
     N = n_harm;
 
-    c_ut = zeros(1,N+1);
-    c_yt = zeros(1,N+1);
+    c_va = zeros(1,N+1);
+    c_vt = zeros(1,N+1);
 
-    c_ut(1) = [a_0_ut];
-    c_yt(1) = [a_0_yt];
+    c_va(1) = a_0_va;
+    c_vt(1) = a_0_vt;
 
-    phi_ut = zeros(1,N);
-    phi_yt = zeros(1,N);
+    phi_va = zeros(1,N);
+    phi_vt = zeros(1,N);
 
     
     for n = 1:N
-        an_ut = (2/T)*trapz(t,cos(2*pi*n*(t/T)).*ut);
-        an_yt = (2/T)*trapz(t,cos(2*pi*n*(t/T)).*yt);
+        an_va = (2/T)*trapz(t,cos(2*pi*n*(t/T)).*va);
+        an_vt = (2/T)*trapz(t,cos(2*pi*n*(t/T)).*vt);
 
-        bn_ut = (2/T)*trapz(t,sin(2*pi*n*(t/T)).*ut);
-        bn_yt = (2/T)*trapz(t,sin(2*pi*n*(t/T)).*yt);
+        bn_va = (2/T)*trapz(t,sin(2*pi*n*(t/T)).*va);
+        bn_vt = (2/T)*trapz(t,sin(2*pi*n*(t/T)).*vt);
 
-        zn_ut = bn_ut+1j*an_ut;
-        zn_yt = bn_yt+1j*an_yt;
+        zn_va = bn_va+1j*an_va;
+        zn_vt = bn_vt+1j*an_vt;
 
-        c_ut(n+1) = abs(zn_ut);
-        c_yt(n+1) = abs(zn_yt);
+        c_va(n+1) = abs(zn_va);
+        c_vt(n+1) = abs(zn_vt);
 
-        phi_ut(n) = angle(zn_ut);
-        phi_yt(n) = angle(zn_yt);
+        phi_va(n) = angle(zn_va);
+        phi_vt(n) = angle(zn_vt);
 
     end
-
-    %gjw_abs = c_yt./c_ut;
-    
-
+   
+    gjw_abs = c_vt(2)/c_va(2);
+    gjw_phi = phi_vt - phi_va;
+ 
 end
