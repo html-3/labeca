@@ -1,4 +1,4 @@
-function bode_plotter()
+function [w] =  bode_plotter()
 
     clc
 
@@ -65,5 +65,5 @@ function bode_plotter()
     lower_lim_freq_hz = 0.1*freq_canto_hz;
     upper_lim_freq_hz = 10*freq_canto_hz;
    
-    logspace(log10(lower_lim_freq_hz), log10(upper_lim_freq_hz),10)
+    w = logspace(log10(lower_lim_freq_hz), log10(upper_lim_freq_hz),10);
     % fazer a aquisição de dados das frequências do logspace + 0.1Hz

@@ -1,4 +1,4 @@
-function [gjw_abs gjw_phi] = iterate_fourier()
+function [gjw_abs, gjw_phi, w] = iterate_fourier()
   
     % Directory path
     directory = 'frequencia/dados_frequencia_hz';
@@ -64,6 +64,10 @@ function [gjw_abs gjw_phi] = iterate_fourier()
         i = i+1;
         
     end
+
+    f = [0.1, round(bode_plotter(),1)];
+    w = 2*pi*f;
+    close all
  
   
 end
