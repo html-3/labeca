@@ -1,7 +1,8 @@
-function [gjw_abs, gjw_phi, w] = iterate_fourier()
+function [gjw_abs, gjw_phi, f] = iterate_fourier()
   
     % Directory path
-    directory = 'frequencia/dados_frequencia_hz';
+    
+    directory = 'labeca\experimento2\frequencia\dados_frequencia_hz';
     files = dir(directory);
     files = files(~ismember({files.name}, {'.', '..'}));
     line = 1.50;
@@ -19,7 +20,6 @@ function [gjw_abs, gjw_phi, w] = iterate_fourier()
     
     i = 1;
     for file = files.'
-
         filename = file.name;
         data = readtable(strcat(directory, "/", filename),'ReadVariableNames', false);
         data = table2array(data);

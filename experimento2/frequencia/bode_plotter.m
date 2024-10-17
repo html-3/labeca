@@ -8,10 +8,10 @@ function [w] =  bode_plotter()
     close all
 
     % Função de Transferência pelo método da área
-    sys_area = tf([K],[tau_area 1]);
+    sys_area = tf(K,[tau_area 1]);
 
     % Função de Transferência pelo método neperiano
-    sys_neperiano = tf([K],[tau_neperiano 1]);
+    sys_neperiano = tf(K,[tau_neperiano 1]);
 
     % Plot de módulo e fase de Boda da F.T. do método da área
     [mag_area, phase_area, w_area] = bode(sys_area);
