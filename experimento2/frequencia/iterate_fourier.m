@@ -1,4 +1,4 @@
-function [gjw_abs, gjw_phi, f] = iterate_fourier()
+function [gjw_abs, gjw_phi, w] = iterate_fourier()
   
     % Directory path
     
@@ -65,8 +65,8 @@ function [gjw_abs, gjw_phi, f] = iterate_fourier()
         
     end
 
-    f = [0.1, round(bode_plotter(),1)];
-    w = 2*pi*f;
+    w = [0.1, round(bode_plotter(),1)];
+    %w = 2*pi*f;
     close all
  
   
