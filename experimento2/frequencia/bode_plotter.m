@@ -1,9 +1,12 @@
-function [w] =  bode_plotter()
+function [f] =  bode_plotter()
 
     clc
-
+    %%{
+    % adding path of labeca_02_simulink_export();
+    addpath(fullfile(pwd, '..\degrau'));%'\labeca\experimento2\degrau'); 
+    
     % Importação de parâmetros da Função de Transferência
-    [~, ~, ~, K, tau_area, tau_neperiano] = labeca_02_simulink_export();
+    [K, tau_area, tau_neperiano] = labeca_02_simulink_export('dados.csv');
 
     close all
 
@@ -13,7 +16,8 @@ function [w] =  bode_plotter()
     % Função de Transferência pelo método neperiano
     sys_neperiano = tf(K,[tau_neperiano 1]);
 
-    % Plot de módulo e fase de Boda da F.T. do método da área
+    %%}
+    % Plot de módulo e fase de Bode da F.T. do método da área
     [mag_area, phase_area, w_area] = bode(sys_area);
     bode(sys_area)
     grid
@@ -65,5 +69,5 @@ function [w] =  bode_plotter()
     lower_lim_freq_hz = 0.1*freq_canto_hz;
     upper_lim_freq_hz = 10*freq_canto_hz;
    
-    w = logspace(log10(lower_lim_freq_hz), log10(upper_lim_freq_hz),10);
+    f = logspace(log10(lower_lim_freq_hz), log10(upper_lim_freq_hz),10); % frequência em Hz
     % fazer a aquisição de dados das frequências do logspace + 0.1Hz

@@ -7,7 +7,7 @@ function [tau_nep] = get_tau_nep(filename)
   t = data(:,1);
 
   % Intervalo antes do inicio do sinal
-  ids_lower_pre = find(t>-0.1);
+  ids_lower_pre = find(t>-0.4);
   ids_upper_pre = find(t<0.0);
   ids_pre = intersect(ids_lower_pre, ids_upper_pre);
 
@@ -21,11 +21,11 @@ function [tau_nep] = get_tau_nep(filename)
 
   % Intervalo dinamico
   ids_lower_dyn = find(0.0 < t);
-  ids_upper_dyn = find(0.3 > t);
+  ids_upper_dyn = find(0.35 > t);
   ids_dyn = intersect(ids_lower_dyn, ids_upper_dyn);
 
   % Carregar dados
-  [~, ~, vt_inf] = get_K;
+  [~, vt_inf, ~] = get_K(filename);
 
   % Cálculo de tau neperiano
   b = log(vt_inf./(abs(vt_inf-vt(ids_dyn))));

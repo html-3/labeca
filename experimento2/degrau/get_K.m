@@ -7,8 +7,8 @@ function [K_degrau, y_inf, A] = get_K(filename)
   t = data(:,1);
 
   % Intervalo antes do inicio do sinal
-  ids_lower_pre = find(t>-0.1);
-  ids_upper_pre = find(t<0.0);
+  ids_lower_pre = find(-0.4 < t);
+  ids_upper_pre = find(0 > t);
   ids_pre = intersect(ids_lower_pre, ids_upper_pre);
 
   % Média do inicio do sinal
@@ -20,12 +20,12 @@ function [K_degrau, y_inf, A] = get_K(filename)
   va = va - va_min;
 
   % Intervalo do sinal considerado no infinito
-  ids_lower_inf = find(t>0.3);
-  ids_upper_inf = find(t<0.4);
+  ids_lower_inf = find(0.35 < t);
+  ids_upper_inf = find(0.73 > t);
   ids_inf = intersect(ids_lower_inf, ids_upper_inf);
   
   % Cálculo de K
   y_inf = mean(vt(ids_inf));
-  A = mean(va(t_inf_ids));
+  A = mean(va(ids_inf));
   K_degrau = (y_inf)/A;
 end

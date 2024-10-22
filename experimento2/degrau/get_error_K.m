@@ -1,4 +1,4 @@
-function [] = get_error_K(filename)
+function error = get_error_K(filename)
 
     % Obter dados
     [K, ~, ~] = get_K(filename);

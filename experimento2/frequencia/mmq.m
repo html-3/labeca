@@ -26,6 +26,7 @@ function x = mmq(D, g)
         % Somatorio para cada elemento de b
         b(i) = sum(Y .* (X .^ (i - 1)));
     end
-    % Resolver MMQ
-    x = flip(inv(A.'*A) * A.' * b, 1); % Inverte ordem dos coeficientes
+   
+    % Inverte ordem dos coeficientes
+    x = flip(inv(A.'*A) * A.' * b, 1);  
 end
