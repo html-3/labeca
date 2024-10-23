@@ -3,7 +3,9 @@ function [f] =  bode_plotter()
     clc
     %%{
     % adding path of labeca_02_simulink_export();
-    addpath(fullfile(pwd, '..\degrau'));%'\labeca\experimento2\degrau'); 
+
+    addpath(fullfile(pwd,'/LABECA/labeca/experimento2/degrau'));% para Guilherme rodar
+    %addpath(fullfile(pwd,'..\degrau')); %'\labeca\experimento2\degrau');% para Carolina rodar
     
     % Importação de parâmetros da Função de Transferência
     [K, tau_area, tau_neperiano] = labeca_02_simulink_export('dados.csv');

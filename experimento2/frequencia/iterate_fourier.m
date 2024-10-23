@@ -3,9 +3,9 @@ function [gjw_abs, gjw_phi, freq_hz, va_matrix, vt_matrix, t_matrix] = iterate_f
     % Directory path
     
     rootDir = pwd; % Obtém o diretório onde o script está
-    directory = fullfile(rootDir, '\dados_frequencia_hz'); 
-    % assim o diretório fica mais genérico, no lugar da linha abaixo:
-    %directory = 'D:\1_UFRJ\2024.2\labeca\labeca\experimento2\frequencia\dados_frequencia_hz';
+    directory = fullfile(rootDir, '\labeca\labeca\experimento2\frequencia\dados_frequencia_hz'); % Para Guilherme rodar
+    %directory = fullfile(rootDir, '\dados_frequencia_hz'); % Para Carolina rodar
+    
     
     files = dir(directory);
     files = files(~ismember({files.name}, {'.', '..'}));
@@ -79,9 +79,6 @@ function [gjw_abs, gjw_phi, freq_hz, va_matrix, vt_matrix, t_matrix] = iterate_f
         
     end
     
-    f = [0.1, round(bode_plotter(),1)]; % logspace usado para aquisição de dados no osciloscópio (igual ao freq_hz)
-    
-    w = 2*pi*f;
     close all
     
 end
