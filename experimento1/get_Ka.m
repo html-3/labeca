@@ -1,4 +1,4 @@
-function [Ka, x, y] = get_Ka()
+function [Ka, x, y] = get_Ka(filename)
   % Carregar o arquivo CSV
   data = readtable(filename);
   data = table2array(data);

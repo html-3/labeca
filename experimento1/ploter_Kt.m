@@ -1,6 +1,6 @@
-function [] = ploter_Kt()
+function [Kt] = ploter_Kt()
     % Carregar dados
-    [~, x, y] = get_Ka('dados_lin.csv');
+    [Kt, x, y] = get_Kt('dados_lin.csv');
 
     p = mmq([x y], 1);  % Ajusta a curva dos dados
 
