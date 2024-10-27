@@ -1,20 +1,22 @@
-function [gjw_abs, gjw_phi, f] = iterate_fourier()
+function [sample_mag, sample_phase, sample_freq] = iterate_fourier()
+    % Retorna o ganho, fase e frequencia da amostragem dos dados na
+    % frequencia
   
     % Directory path
-    
-    directory = 'labeca\experimento2\frequencia\dados_frequencia_hz';
+    directory = 'experimento2\frequencia\dados_frequencia_hz';
     files = dir(directory);
     files = files(~ismember({files.name}, {'.', '..'}));
     line = 1.50;
 
-    figure
-    ylabel('Tensão (V)');
-    xlabel('Tempo (s)');
-    title('Variação do sinal na região linear')
-    hold on
+    %figure
+    %ylabel('Tensão (V)');
+    %xlabel('Tempo (s)');
+    %title('Variação do sinal na região linear')
+    %hold on
 
-    gjw_abs = zeros(1,length(files));
-    gjw_phi = zeros(1,length(files));
+    sample_mag = zeros(1,length(files));
+    sample_phase = zeros(1,length(files));
+    sample_freq = zeros(1,length(files));
 
     n_harmonicas = 1;
     
@@ -49,25 +51,20 @@ function [gjw_abs, gjw_phi, f] = iterate_fourier()
         vt = vt(ids);
         t = t(ids);
         
-        figure
-        plot(t,va,t,vt)
-        ylabel('Tensão (V)');
-        xlabel('Tempo (s)');
-        grid on
+        %plot(t,va,t,vt)
+        %ylabel('Tensão (V)');
+        %xlabel('Tempo (s)');
+        %grid on
 
         [abs, phi] = fourier(n_harmonicas, va, vt, t);
 
-        gjw_abs(i) = abs;
-        gjw_phi(i) = phi;
+        sample_mag(i) = abs;
+        sample_phase(i) = phi;
+        sample_freq(i) = freq_estimate;
        
-        
         i = i+1;
         
     end
-
-    f = [0.1, round(bode_plotter(),1)];
-    w = 2*pi*f;
-    close all
- 
-  
+    
+    close all 
 end
