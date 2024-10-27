@@ -1,5 +1,6 @@
 function x = mmq_origin(D, g)
-    % Metodo dos Minimos Quadrados (Least Squares Method)
+    % Metodo dos Minimos Quadrados com coeficiente linear zero
+    
     % D - tabela de dados com duas colunas (x e y)
     % g - grau do polinomio de ajuste
     % A - matriz do sistema Ax = b
