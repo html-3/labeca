@@ -1,13 +1,13 @@
-function [K, tau_nep, tau_area, t, vt, va] = get_sim_params(filename)
+function [K, tau_nep, tau_area, t, vt, va] = step_params(filename)
   % Coleta de dados
-  data = readtable(filename);
+  data = readtable(filename, 'ReadVariableNames', false);
   data = table2array(data);
   vt = data(:,3);
   va = data(:,2);
   t = data(:,1);
 
   % Obter parametros
-  [K, ~, ~] = get_K(filename);
+  [K] = get_K(filename);
   [tau_area] = get_tau_area(filename);
   [tau_nep] = get_tau_nep(filename);
 
