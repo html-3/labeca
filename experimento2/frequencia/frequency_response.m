@@ -1,102 +1,77 @@
-function frequency_response()
-    % Obtém os dados de frequência e resposta a partir de outra função
-    [magnitude_abs, phase, frequency] = iterate_fourier();
-
-    % Converte a magnitude para escala em decibéis (dB)
-    magnitude_db = 20 * log10(magnitude_abs);
+function [K, tau] = frequency_response()
     
-    % Converte a fase para escala em graus
-    phase_deg = rad2deg(phase);
+    [gjw_abs,~, w] = iterate_fourier(); % esse w está em hz, e não em rad/s
 
-    % Ajuste de baixa frequência usando mínimos quadrados (1º grau)
-    low_freq_range = frequency(1:3);
-    low_freq_db = magnitude_db(1:3);
-    linear_poly_low_freq = polyfit(low_freq_range, low_freq_db, 1);  % Ajuste linear
-
-    % Cálculo do coeficiente de determinação (R^2) para ajuste linear
-    linear_trend_low_freq = polyval(linear_poly_low_freq, low_freq_range);
-    SS_total_low_freq = sum((low_freq_db - mean(low_freq_db)).^2);
-    SS_residual_low_freq = sum((low_freq_db - linear_trend_low_freq).^2);
-    R2_low_freq = 1 - SS_residual_low_freq / SS_total_low_freq;
-
-    % Formata a equação do ajuste linear para exibir no gráfico
-    linear_eq_low_freq = sprintf('%.3fx + %.3f (R^2 = %.3f)', linear_poly_low_freq(1), linear_poly_low_freq(2), R2_low_freq);
-
-    % Gráfico Bode para magnitude em baixa frequência
-    figure(1);
-    subplot(2,1,1);  % Subplot superior para a magnitude em dB
-    semilogx(frequency, magnitude_db, '+', 'DisplayName', 'Dados originais');
-    hold on;
-    semilogx(low_freq_range, linear_trend_low_freq, 'r', 'DisplayName', linear_eq_low_freq);
-    grid on;
-    legend;
-    xlabel('Frequência (Hz)');
-    ylabel('Magnitude (dB)');
-    title('Diagrama de Bode - Magnitude');
-
-    % Gráfico Bode para fase
-    subplot(2,1,2);  % Subplot inferior para a fase em graus
-    semilogx(frequency, phase_deg, 'o', 'DisplayName', 'Fase');
-    grid on;
-    legend;
-    xlabel('Frequência (Hz)');
-    ylabel('Fase (graus)');
-    title('Diagrama de Bode - Fase');
-
-    % Calcula K em dB (intercepto do ajuste linear)
-    intercept_db = linear_poly_low_freq(2);
-
-    % Ajuste de toda a faixa de frequência usando um polinômio de 3º grau
-    cubic_poly_full_range = polyfit(frequency, magnitude_db, 3);  % Ajuste cúbico
-
-    % Cálculo do coeficiente de determinação (R^2) para ajuste cúbico
-    cubic_trend_full_range = polyval(cubic_poly_full_range, frequency);
-    SS_total_full_range = sum((magnitude_db - mean(magnitude_db)).^2);
-    SS_residual_full_range = sum((magnitude_db - cubic_trend_full_range).^2);
-    R2_full_range = 1 - SS_residual_full_range / SS_total_full_range;
-
-    % Formata a equação do ajuste cúbico para exibir no gráfico
-    cubic_eq_full_range = sprintf('%.3fx^3 + %.3fx^2 + %.3fx + %.3f (R^2 = %.3f)', ...
-        cubic_poly_full_range(1), cubic_poly_full_range(2), cubic_poly_full_range(3), ...
-        cubic_poly_full_range(4), R2_full_range);
+    % Vetores gjwdb
+    gjwdb = 20*log10(gjw_abs);
     
-    % Gráfico Bode completo de magnitude
-    figure(2);
-    subplot(2,1,1);  % Subplot superior para a magnitude em dB
-    semilogx(frequency, magnitude_db, '+', 'DisplayName', 'Dados originais');
+    % Tirando o último ponto, com polinômio de grau 3, o tau = 0.1101, e deixando-o, o tau = 0.1124
+    % Tirando o último ponto, com polinômio de grau 1, o tau = 0.096.., e deixando-o, o tau = 0.1013
+    % pode ser somente o grau do polinômio q ta dando ruim, ou o q fizemos
+    % com um grau maior esteja certo.
+    gjwdb = gjwdb(1:end-1);
+    w = w(1:end-1);
+
+    % Ajuste por mínimos quadrados das baixas frequências
+    x = w(1:2)';
+    y = gjwdb(1:2)';
+    poli_mmq = mmq([x,y],1);
+
+    % Calculo de R^2 (curva)
+    curva_tendencia = polyval(poli_mmq,x);
+    
+    SS_tot = sum((y - mean(y)).^2); % Soma total dos quadrados
+    SS_res_1grau = sum((y - curva_tendencia).^2); 
+    R2_1grau = 1 - SS_res_1grau/SS_tot;
+    
+    eq_1grau = sprintf('%.3fx+%.3f (R^2 = %.3f)',poli_mmq(1), poli_mmq(2), R2_1grau);
+   
+    % Bode Plot
+    figure(1)
+    semilogx(w, gjwdb, '+'); 
     hold on;
-    semilogx(frequency, cubic_trend_full_range, 'r', 'DisplayName', cubic_eq_full_range);
+    semilogx(x, curva_tendencia, 'r'); 
+    legend('Dados originais', eq_1grau);
     grid on;
-    legend;
-    xlabel('Frequência (Hz)');
-    ylabel('Magnitude (dB)');
-    title('Ajuste Cúbico de Faixa Completa');
+    
+    % Cálculo de Kdb
+    Kdb = poli_mmq(2); % coeficiente linear do polinômio
 
-    % Gráfico Bode completo de fase
-    subplot(2,1,2);  % Subplot inferior para a fase em graus
-    semilogx(frequency, phase_deg, 'o', 'DisplayName', 'Fase');
-    grid on;
-    legend;
-    xlabel('Frequência (Hz)');
-    ylabel('Fase (graus)');
-    title('Ajuste Cúbico de Faixa Completa');
+    % Ajuste por mínimos quadrados para o bode inteiro
 
-    % Gera um conjunto de frequências para interpolação do ajuste cúbico
-    interpolated_freq = logspace(log10(frequency(1)), log10(frequency(end)), 200);
-    interpolated_magnitude_db = polyval(cubic_poly_full_range, interpolated_freq);
+    polinomio = mmq([w',gjwdb'],3);
 
-    % Gráfico da interpolação do ajuste cúbico
-    figure(3);
-    semilogx(frequency, magnitude_db, '+', 'DisplayName', 'Dados originais');
+    % Calculo de R^2 (curva)
+    curva_tendencia = polyval(polinomio,w);
+    
+    SS_tot = sum((gjwdb - mean(gjwdb)).^2); % Soma total dos quadrados
+    SS_res_1grau = sum((gjwdb - curva_tendencia).^2); 
+    R2_3grau = 1 - SS_res_1grau/SS_tot;
+    
+    eq_3grau = sprintf('%.3fx^3+%.3fx^2+%.3fx+%.3f (R^2 = %.3f)',polinomio(1),polinomio(2),polinomio(3),polinomio(4),R2_3grau); 
+    %sprintf('%.3fx+%.3f (R^2 = %.3f)',polinomio(1),polinomio(2),R2_3grau); 
+    
+    % Bode Plot
+    figure(2)
+    semilogx(w, gjwdb, '+'); 
     hold on;
-    semilogx(interpolated_freq, interpolated_magnitude_db, 'b', 'DisplayName', 'Curva Interpolada');
-    legend;
+    semilogx(w, curva_tendencia, 'r'); 
+    legend('Dados originais', eq_3grau);
     grid on;
-    xlabel('Frequência (Hz)');
-    ylabel('Magnitude (dB)');
-    title('Interpolação da Curva Cúbica');
 
-    % Calcula o ganho K em escala linear e estima tau
-    K = 10^(intercept_db / 20);
-    tau = interpolated_freq(find(interpolated_magnitude_db <= intercept_db - 3, 1));  % Revisar cálculo de tau
+    ww = logspace(log10(w(1)),log10(w(end)),200);
+    gww = polyval(polinomio,ww);
+    
+    figure(3)
+    semilogx(w, curva_tendencia, 'r'); 
+    hold on;
+    semilogx(ww, gww, 'b');
+    legend('Dados originais', eq_3grau);
+    grid on;
+    
+    %Cálculo de K e Tau
+    K = 10^(Kdb/20);
+    
+    tau_gain = Kdb-3;     
+    tau = 1/(2*pi*(ww(find(squeeze(gww)<=tau_gain, 1, 'first'))));
 end

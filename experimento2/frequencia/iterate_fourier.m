@@ -3,7 +3,13 @@ function [sample_mag, sample_phase, sample_freq] = iterate_fourier()
     % frequencia
   
     % Directory path
-    directory = 'experimento2\frequencia\dados_frequencia_hz';
+
+    rootDir = pwd; % Obtém o diretório onde o script está 
+    directory = fullfile(rootDir, '\2024.2\labeca\labeca\experimento2\frequencia\dados_frequencia_hz'); % Para Guilherme rodar
+    %directory = fullfile(rootDir, '\dados_frequencia_hz'); % Para Carolina rodar
+
+    %directory = 'experimento2\frequencia\dados_frequencia_hz'; % Para Henrique rodar
+    
     files = dir(directory);
     files = files(~ismember({files.name}, {'.', '..'}));
     line = 1.50;
