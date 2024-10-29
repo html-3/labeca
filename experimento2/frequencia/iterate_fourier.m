@@ -1,4 +1,4 @@
-function [sample_mag, sample_phase, sample_freq] = iterate_fourier()
+function [sample_mag, sample_phase, sample_freq, va_matrix, vt_matrix ,t_matrix] = iterate_fourier()
     % Retorna o ganho, fase e frequencia da amostragem dos dados na
     % frequencia
   
@@ -24,6 +24,11 @@ function [sample_mag, sample_phase, sample_freq] = iterate_fourier()
     sample_phase = zeros(1,length(files));
     sample_freq = zeros(1,length(files));
 
+    data_lenght = 10000;
+    va_matrix = zeros(data_lenght,length(files));
+    vt_matrix = zeros(data_lenght,length(files));
+    t_matrix = zeros(data_lenght,length(files));
+
     n_harmonicas = 1;
     
     i = 1;
@@ -34,6 +39,10 @@ function [sample_mag, sample_phase, sample_freq] = iterate_fourier()
         vt = data(:,3);
         va = data(:,2);
         t = data(:,1);
+
+        va_matrix(:,i) = va;
+        vt_matrix(:,i) = vt;
+        t_matrix(:,i) = t;
 
        
         % Remoção do off-set do sinal
