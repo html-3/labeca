@@ -39,7 +39,7 @@ function [K, tau] = frequency_response()
 
     % Ajuste por mínimos quadrados para o bode inteiro
     
-    p=[1 1 1 1 1 1 0.5 0.5 0.5 0.5];
+    p=[1 1 1 1 1 1 0.5 0.1 0.1 0.1];
     
     polinomio = mmq_weighted([w',gjwdb'],p,4);
 
