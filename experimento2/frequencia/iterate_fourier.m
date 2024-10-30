@@ -5,8 +5,8 @@ function [sample_mag, sample_phase, sample_freq, va_matrix, vt_matrix ,t_matrix]
     % Directory path
 
     rootDir = pwd; % Obtém o diretório onde o script está 
-    directory = fullfile(rootDir, '\2024.2\labeca\labeca\experimento2\frequencia\dados_frequencia_hz'); % Para Guilherme rodar
-    %directory = fullfile(rootDir, '\dados_frequencia_hz'); % Para Carolina rodar
+    %directory = fullfile(rootDir, '\2024.2\labeca\labeca\experimento2\frequencia\dados_frequencia_hz'); % Para Guilherme rodar
+    directory = fullfile(rootDir, '\dados_frequencia_hz'); % Para Carolina rodar
 
     %directory = 'experimento2\frequencia\dados_frequencia_hz'; % Para Henrique rodar
     

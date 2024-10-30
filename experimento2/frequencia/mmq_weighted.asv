@@ -1,14 +1,20 @@
-function x = mmq_weighted(D,w,g)
+function x = mmq_weighted(D,g,w)
     % Metodo dos Minimos Quadrados 
 
     % D - tabela de dados com duas colunas (x e y)
     % g - grau do polinomio de ajuste
     % A - matriz do sistema Ax = b
     % b - vetor do sistema Ax = b
-
+    
+    % Se o vetor w não for especificado, então ele é um vetor de 1's
+    if nargin == 1 || isempty(w)
+        w = ones();
+    end
+    
+    w = diag(w);
     % Extrair o conjunto de pontos X e Y da tabela
     X = D(:, 1);
-    b = D(:, 2);
+    b = w*D(:, 2);
 
     [m,~] = size(b);
 
@@ -22,8 +28,8 @@ function x = mmq_weighted(D,w,g)
             A(i, j) = X(i)^(g-j+1);
         end
     end
-    
+    A = w*A;
     % Resolver MMQ
     x = (A'*A)\(A'*b);
-    size(x)
+    % size(x)
 end
