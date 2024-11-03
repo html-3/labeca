@@ -1,4 +1,4 @@
-function [sample_mag, sample_phase, sample_freq, va_matrix, vt_matrix ,t_matrix] = iterate_fourier()
+function [sample_mag, sample_phase, sample_freq, dataStruct] = iterate_fourier()
     % Retorna o ganho, fase e frequencia da amostragem dos dados na
     % frequencia
   
@@ -14,21 +14,13 @@ function [sample_mag, sample_phase, sample_freq, va_matrix, vt_matrix ,t_matrix]
     files = files(~ismember({files.name}, {'.', '..'}));
     line = 1.50;
 
-    %figure
-    %ylabel('Tensão (V)');
-    %xlabel('Tempo (s)');
-    %title('Variação do sinal na região linear')
-    %hold on
-
     sample_mag = zeros(1,length(files));
     sample_phase = zeros(1,length(files));
     sample_freq = zeros(1,length(files));
-
-    data_lenght = 10000;
-    va_matrix = zeros(data_lenght,length(files));
-    vt_matrix = zeros(data_lenght,length(files));
-    t_matrix = zeros(data_lenght,length(files));
-
+    
+    % Inicializa estrutura para armazenar os dados e resultados da Série de Fourier
+    dataStruct = struct();
+    
     n_harmonicas = 1;
     
     i = 1;
@@ -39,17 +31,13 @@ function [sample_mag, sample_phase, sample_freq, va_matrix, vt_matrix ,t_matrix]
         vt = data(:,3);
         va = data(:,2);
         t = data(:,1);
-
-        va_matrix(:,i) = va;
-        vt_matrix(:,i) = vt;
-        t_matrix(:,i) = t;
-
-       
+        
         % Remoção do off-set do sinal
-        va = va - mean(va);
+        vaSemOffSet = va - mean(va);
+        %vt = vt - mean(vt);
         
         % Suavizar a curva para simular observação empírica do sinal
-        va_smooth = smooth(va, 100);
+        va_smooth = smooth(vaSemOffSet, 100);
         
         % Marcar onde a reta cruza a senoide
         crossings = diff(va_smooth > line) ~= 0;
@@ -65,21 +53,50 @@ function [sample_mag, sample_phase, sample_freq, va_matrix, vt_matrix ,t_matrix]
         va = va(ids);
         vt = vt(ids);
         t = t(ids);
-        
-        %plot(t,va,t,vt)
-        %ylabel('Tensão (V)');
-        %xlabel('Tempo (s)');
-        %grid on
 
-        [abs, phi] = fourier(n_harmonicas, va, vt, t);
+        [abs, phi, va_t, vt_t] = fourier(n_harmonicas, va, vt, t);
 
         sample_mag(i) = abs;
         sample_phase(i) = phi;
         sample_freq(i) = freq_estimate;
+        
+        % Salva os dados e resultados na estrutura
+        dataStruct(i).va = va;
+        dataStruct(i).vt = vt;
+        dataStruct(i).t = t;
+        dataStruct(i).va_t = va_t;
+        dataStruct(i).vt_t = vt_t;
        
         i = i+1;
         
     end
     
-    close all 
+    % sample_freq = 0.1000    0.2000    0.3000    0.5000    0.8000    1.4000    2.3000    3.8000    6.3000   10.6000   17.6000
+    
+    freqPlot = [1, 6];
+    
+    for i = 1:length(freqPlot)
+        
+        figure;
+        subplot(2,1,1);
+        plot(dataStruct(freqPlot(i)).t, dataStruct(freqPlot(i)).va);
+        hold on;
+        plot(dataStruct(freqPlot(i)).t, dataStruct(freqPlot(i)).va_t, 'LineWidth', 2);
+        title(sprintf('Va - Comparação do Sinal Original e sua Série de Fourier - %.3f Hz', sample_freq(freqPlot(i))));
+        xlabel('Tempo (s)');
+        ylabel('Tensão (V)');
+        legend('Dados originais', 'Série de Fourier do Sinal');
+        grid on;
+
+        subplot(2,1,2);
+        plot(dataStruct(freqPlot(i)).t, dataStruct(freqPlot(i)).vt);
+        hold on;
+        plot(dataStruct(freqPlot(i)).t, dataStruct(freqPlot(i)).vt_t, 'LineWidth', 2);
+        title(sprintf('Vt - Comparação do Sinal Original e sua Série de Fourier - %.3f Hz', sample_freq(freqPlot(i))));
+        xlabel('Tempo (s)');
+        ylabel('Tensão (V)');
+        legend('Dados originais', 'Série de Fourier do Sinal');
+        grid on;
+        
+    end
 end

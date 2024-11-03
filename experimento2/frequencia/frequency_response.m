@@ -1,6 +1,6 @@
 function [K, tau] = frequency_response()
     
-    [gjw_abs,~, w,~,~,~] = iterate_fourier(); % esse w está em hz, e não em rad/s
+    [gjw_abs,~, w,~] = iterate_fourier(); % esse w está em hz, e não em rad/s
 
     % Vetores gjwdb
     gjwdb = 20*log10(gjw_abs);
@@ -20,7 +20,7 @@ function [K, tau] = frequency_response()
     gww = polyval(polinomio,ww);
     
     % Cálculo de Kdb
-    
+    % Seleção de um intervalo de baixas frequências para calcular o Kdb posteriormente
     ww_Kdb = intersect(ww(find(ww>=0.1)), ww(find(ww<0.2)));
     gww_Kdb = intersect(gww(find(ww>=0.1)), gww(find(ww<0.2)));
     
@@ -54,7 +54,8 @@ function [K, tau] = frequency_response()
     [mag, ~, omega] = bode(sys);
     freq = omega / (2 * pi); % Hz
     mag_db = 20 * log10(squeeze(mag));
-
+    
+    % Gráfico para fazer a validação do modelo
     figure(3);
     semilogx(w, gjwdb, '+'); 
     hold on;
