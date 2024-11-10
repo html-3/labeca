@@ -1,7 +1,8 @@
 function [Ra, La, f, J, t, va, vt, ia, Kt, Kg, Ka] = electrical_mechanical_parameters(filename)
 
     % filename = 'buslin01.csv'
-
+    addpath('D:\1_UFRJ\2024.2\labeca\labeca\experimento_espaço de estados\dados_sweep_display'); % Para Carolina Rodar
+    
     % Coleta de dados
     data = readtable(filename, 'ReadVariableNames', false);
     data = table2array(data);
@@ -33,7 +34,7 @@ function [Ra, La, f, J, t, va, vt, ia, Kt, Kg, Ka] = electrical_mechanical_param
 
     
     % Definição do vetor entradas elétrico e mecânico
-    [Kt, ~, ~] = get_Kt('dados_lin.csv'); % Encontrado no primeiro experimento em laboratório
+    [Kt, ~, ~] = get_Kt('dados_lin.csv'); % Encontrado no 1º experimento em laboratório
     [Kg] = computing_Kg('dados_lin.csv');
     Ka = Kg; % Será alterado
 

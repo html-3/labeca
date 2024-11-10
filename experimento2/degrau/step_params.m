@@ -1,4 +1,5 @@
 function [K, tau_nep, tau_area, t, vt, va] = step_params(filename)
+  % Função criada para exportar os dados para o simulink
   % Coleta de dados
   data = readtable(filename, 'ReadVariableNames', false);
   data = table2array(data);

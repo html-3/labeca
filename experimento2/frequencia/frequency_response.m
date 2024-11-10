@@ -1,6 +1,7 @@
 function [K, tau] = frequency_response()
     
     [gjw_abs,~, w,~] = iterate_fourier(); % esse w está em hz, e não em rad/s
+    close all
 
     % Vetores gjwdb
     gjwdb = 20*log10(gjw_abs);
