@@ -5,39 +5,48 @@ function [Ra, La, f, J, t, va, vt, ia, Kt, Kg, Ka] = electrical_mechanical_param
     % Coleta de dados
     data = readtable(filename, 'ReadVariableNames', false);
     data = table2array(data);
-
-    ia = 20*data(:,4); % Ganho na saída
-    ia = ia(2:2:end);
-    ia = ia - mean(ia); % Remoção de Offset de ia
-
+    
+    % Vetor corrente de armadura
+    G = 20; % Ganho na saída
+    ia = G * data(:,4); 
+    ia = ia(2:2:end); % Metade do sampling
+    ia = ia - mean(ia(1:4)); % Remoção de Offset de ia
+    
+    % Vetor tensão tacômetro
     vt = data(:,3);
-    vt = vt(2:2:end);
-    vt = vt-mean(vt);% Remoção de Offset de vt
-
+    vt = vt(2:2:end); % Metade do sampling
+    vt = vt-mean(vt(1:4)); % Remoção de Offset de vt
+    
+    % Vetor tensão de armadura
     va = data(:,2);
-    va = va(2:2:end);
-    va = va - mean(va);% Remoção de Offset de va
-
+    va = va(2:2:end); % Metade do sampling
+    va = va - mean(va(1:4)); % Remoção de Offset de va
+    
+    % Vetor tempo
     t = data(:,1);
-    t = t(2:2:end);
-
+    t = t(2:2:end); % Metade do sampling
+    t = t - t(1); % Remoção de Offset de t
+    
+    % Remoção de valores pequenos (?)
     V = [va, vt, ia];
-    index = find(V>=0,1);
-
+    index = find(V >= 0,1);
     t = t(index:end);
-    V = V(index:end, :);
+    V = V(index:end,:);
     
     va = V(:,1);
     vt = V(:,2);
     ia = V(:,3);
-
     
     % Definição do vetor entradas elétrico e mecânico
     [Kt, ~, ~] = get_Kt('dados_lin.csv'); % Encontrado no primeiro experimento em laboratório
     [Kg] = computing_Kg('dados_lin.csv');
+    Kg = Kg;
+    
+    % Como Ka tem a mesma dimensão de Kg, eles são iguais (Basilio, 2004)
     Ka = Kg; % Será alterado
-
-    Ue = va-(Kg/Kt)*vt;
+    
+    % Variáveis de estado intermediárias
+    Ue = va - (Kg/Kt) *vt;
     Um = Ka*Kt*ia;
 
     % Montagem de Me e Mm
@@ -48,16 +57,17 @@ function [Ra, La, f, J, t, va, vt, ia, Kt, Kg, Ka] = electrical_mechanical_param
     Xe = inv(Me'*Me)*Me'*ia(2:end);
     Xm = inv(Mm'*Mm)*Mm'*vt(2:end);
 
-    % Estimação dos parâmetros
+    % Estimação dos parâmetros elétricos e mecânicos
     phi_e = Xe(1);
-    phi_m = Xm(1);
     gamma_e = Xe(2);
+    phi_m = Xm(1);
     gamma_m = Xm(2);
-
-    h = mean(diff(t)); % Intervalo de amostragem
+    
+    % Intervalo de amostragem
+    h = mean(diff(t)); 
 
     Ra = (1-phi_e)/gamma_e;
-    La = -(Ra*h)/(log(phi_e));
+    La = -(Ra*h)/log(phi_e);
     f = (1-phi_m)/gamma_m;
     J = -(f*h)/log(phi_m);
-
+end
