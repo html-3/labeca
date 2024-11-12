@@ -1,0 +1,21 @@
+function [KgKt,x,y] = get_KgKt(filename)
+    % Retorna ganho da relacao tensao entrada-saida
+    
+    % Carregar o arquivo CSV
+    data = readtable(filename,'ReadVariableNames', false);
+    data = table2array(data);
+    
+    figure
+    plot(data(:,1), data(:,2),data(:,1),data(:,3))
+    index = find(data(:,3)> -2);
+    
+    figure
+    % Ordem das colunas: 1) tempo 2) Va_sample 3) Vt_sample
+    x = data(:,3) - mean(data(:,3));
+    y = data(:,2) - mean(data(:,2));
+
+    p = mmq([x y], 1);  % Ajusta a curva dos dados
+    KgKt = p(1);
+  
+    fprintf('Kg/Kt = %.4g V/V \n',KgKt);
+end
