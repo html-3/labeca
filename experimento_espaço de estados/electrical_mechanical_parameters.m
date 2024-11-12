@@ -1,4 +1,4 @@
-function [Ra, La, f, J, t, va, vt, ia, Kt, Kg, Ka] = electrical_mechanical_parameters(filename)
+function [Ra, La, f, J, t, va, vt, ia, Kt, Kg,Kg_spin, Ka] = electrical_mechanical_parameters(filename)
 
     % filename = 'buslin01.csv'
     
@@ -8,18 +8,19 @@ function [Ra, La, f, J, t, va, vt, ia, Kt, Kg, Ka] = electrical_mechanical_param
 
     ia = 20*data(:,4); % Ganho na saída
     ia = ia(2:2:end);
-    ia = ia - mean(ia); % Remoção de Offset de ia
+    ia = ia - mean(ia(1:4)); % Remoção de Offset de ia
 
     vt = data(:,3);
     vt = vt(2:2:end);
-    vt = vt-mean(vt);% Remoção de Offset de vt
+    vt = vt - mean(vt(1:4));% Remoção de Offset de vt
 
     va = data(:,2);
     va = va(2:2:end);
-    va = va - mean(va);% Remoção de Offset de va
+    va = va - mean(va(1:4));% Remoção de Offset de va
 
     t = data(:,1);
     t = t(2:2:end);
+    t = t - t(1);
 
     V = [va, vt, ia];
     index = find(V>=0,1);
@@ -35,7 +36,9 @@ function [Ra, La, f, J, t, va, vt, ia, Kt, Kg, Ka] = electrical_mechanical_param
     % Definição do vetor entradas elétrico e mecânico
     [Kt, ~, ~] = get_Kt('dados_lin.csv'); % Encontrado no 1º experimento em laboratório
     [Kg] = computing_Kg('dados_lin.csv');
-    Ka = Kg; % Será alterado
+    %[KgKt] = get_KgKt('spin.csv');
+    %Kg_spin = KgKt*Kt; % Será alterado
+    Ka = Kg;
 
     Ue = va-(Kg/Kt)*vt;
     Um = Ka*Kt*ia;
