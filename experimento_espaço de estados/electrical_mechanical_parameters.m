@@ -1,7 +1,6 @@
 function [Ra, La, f, J, t, va, vt, ia, Kt, Kg, Ka] = electrical_mechanical_parameters(filename)
 
     % filename = 'buslin01.csv'
-    addpath('D:\1_UFRJ\2024.2\labeca\labeca\experimento_espaço de estados\dados_sweep_display'); % Para Carolina Rodar
     
     % Coleta de dados
     data = readtable(filename, 'ReadVariableNames', false);
