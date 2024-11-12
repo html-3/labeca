@@ -1,7 +1,7 @@
-function [] = get_error_K()
+function get_error_K()
     
-    addpath('C:\Users\Guilherme\Documents\UFRJ\2024.2\LABECA\labeca\experimento1'); % Para Guilherme Rodar
-    
+    % addpath('C:\Users\Guilherme\Documents\UFRJ\2024.2\LABECA\labeca\experimento1'); % Para Guilherme Rodar
+    addpath('..\..\experimento1'); % Para Carolina rodar
     % Obter ganhos
     [K, ~, ~] = get_K('dados.csv');
     Ka = get_Ka('dados_lin.csv');
