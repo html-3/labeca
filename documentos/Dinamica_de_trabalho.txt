@@ -14,8 +14,10 @@ E, depois, dê o comando para enviar esses commits do seu repositório para o gi
 - git push origin <nome_da_sua_branch>
 
 Ao finalizar todo o serviço, faça o merge com a main:
-- git merge main.
-Caso occoram conflitos, resolva-os manualmente no VsCode e prossiga.
+- git checkout main
+- git merge <noma_da_sua_branch>
+- git push origin main 
+Caso ocorram conflitos, resolva-os manualmente no VsCode e prossiga.
 
 
 IMPORTANTE!!!!!
