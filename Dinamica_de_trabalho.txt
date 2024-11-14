@@ -1,0 +1,34 @@
+Sequência de comandos:
+
+Ao iniciar um trabalho, esteja na branch main e rode o seguinte comando:
+- git checkout -b <nome_da_branch_nova>
+Com isso, você terá criado uma branch nova a partir da main e navegado até ela.
+
+Caso não esteja na main, rode o seguinte comando antes:
+- git checkout main
+
+A cada tarefa concluída, commite as alterações na sua branch criada utilizando os seguintes comandos:
+- git add .
+- git commit -m <mensagem_do_commit>
+E, depois, dê o comando para enviar esses commits do seu repositório para o github:
+- git push origin <nome_da_sua_branch>
+
+Ao finalizar todo o serviço, faça o merge com a main:
+- git merge main.
+Caso occoram conflitos, resolva-os manualmente no VsCode e prossiga.
+
+
+IMPORTANTE!!!!!
+
+Antes de iniciar o trabalho em sua branch em um novo dia e antes de fazer o merge, rodar o seguinte comando:
+- git fetch --all (ele vai atualizar o repositório local com o remoto)
+Caso a linha de comando peça, dê o seguinte comando:
+- git pull origin main
+Depois, prossiga.
+
+Depois de realizar o merge, avisar sempre ao grupo.
+
+
+
+
+
