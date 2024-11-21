@@ -1,5 +1,4 @@
-function [Ra, La, f, J, t, va, vt, ia, Kt, Kg,Kg_spin, Ka] = electrical_mechanical_parameters(filename)
-
+function [Ra, La, f, J, t, va, vt, ia, Kt, Kg, Ka] = electrical_mechanical_parameters(filename)
     % filename = 'buslin01.csv'
     
     % Coleta de dados
@@ -8,6 +7,7 @@ function [Ra, La, f, J, t, va, vt, ia, Kt, Kg,Kg_spin, Ka] = electrical_mechanic
 
     ia = 20*data(:,4); % Ganho na saída
     ia = ia(2:2:end);
+    % Pq foi feito dessa forma?
     ia = ia - mean(ia(1:4)); % Remoção de Offset de ia
 
     vt = data(:,3);
