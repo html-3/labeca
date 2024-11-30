@@ -3,23 +3,25 @@
 close all;
 
 % Carregar os dados do osciloscópio (CSV)
-osc_data = readmatrix('osc_val_sent.csv'); % Substituir pelo nome do seu arquivo
+osc_data = readmatrix('rect_sig_osc_received.csv'); % Substituir pelo nome do seu arquivo
 osc_t_raw = osc_data(:, 1); % Primeira coluna: tempo (s)
 osc_signal_raw = osc_data(:, 2); % Segunda coluna: amplitude (V)
 
-osc_t_shift = osc_t_raw(170:end)-osc_t_raw(170); % Shifta o tempo para começar em 0s
-osc_signal_shift = osc_signal_raw(170:end);
+osc_t_shift = osc_t_raw(find(osc_t_raw>=-0.3):end)-osc_t_raw(find(osc_t_raw>=-0.3, 1, 'first')); % Shifta o tempo para começar em 0s
+osc_signal_shift = osc_signal_raw(find(osc_t_raw>=-0.3):end);
 
 % Carregar os dados do Arduino Due (MAT)
-arduino_data = load('ard_val_received.mat'); % Substituir pelo nome do seu arquivo
-ts1 = arduino_data.arduino(1); % Primeiro timeseries
-ts2 = arduino_data.arduino(2); % Segundo timeseries
+arduino_data = load('rect_arduino_sent.mat'); % Substituir pelo nome do seu arquivo
 
-arduino_t_raw = ts1.Data; % tempo (poderia ser ts2.Time, daria no mesmo)
-arduino_t_shift = arduino_t_raw(160:end) - arduino_t_raw(160);
-arduino_t_shift = arduino_t_shift(find(arduino_t_shift <= osc_t_shift(end)));
+arduino_data_raw = arduino_data.rect_arduino.Data;
+arduino_t_raw = arduino_data.rect_arduino.Time;
 
-arduino_signal_raw = double(ts2.Data);
+% CÓDIGO INCOMPLETO, FALTAM OS DADOS DO SCOPE DO SIMULINK USANDO O ARDUINO
+
+% arduino_t_shift = arduino_t_raw(160:end) - arduino_t_raw(160);
+% arduino_t_shift = arduino_t_shift(find(arduino_t_shift <= osc_t_shift(end)));
+
+arduino_signal_raw = double(arduino_data.rect_arduino.Data);
 
 ard_signal = zeros(1, size(arduino_signal_raw,3));
 
