@@ -3,14 +3,24 @@
 close all;
 
 % Carregar os dados do osciloscópio (CSV)
-osc_data = readmatrix('ard_test.csv'); % Substituir pelo nome do seu arquivo
+
+osc_data = readmatrix('osc_val_sent.csv'); % Substituir pelo nome do seu arquivo
 osc_t_raw = osc_data(:, 1); % Primeira coluna: tempo (s)
 osc_signal_raw = osc_data(:, 2); % Segunda coluna: amplitude (V)
 
+osc_t_shift = osc_t_raw(170:end)-osc_t_raw(170); % Shifta o tempo para começar em 0s
+osc_signal_shift = osc_signal_raw(170:end);
+
 % Carregar os dados do Arduino Due (MAT)
-arduino_data = load('out.mat'); % Substituir pelo nome do seu arquivo
-arduino_t_raw = arduino_data.out.ScopeData.time; 
-arduino_signal_raw = double(arduino_data.out.ScopeData.signals.values); 
+arduino_data = load('ard_val_received.mat'); % Substituir pelo nome do seu arquivo
+ts1 = arduino_data.arduino(1); % Primeiro timeseries
+ts2 = arduino_data.arduino(2); % Segundo timeseries
+
+arduino_t_raw = ts1.Data; % tempo (poderia ser ts2.Time, daria no mesmo)
+arduino_t_shift = arduino_t_raw(160:end) - arduino_t_raw(160);
+arduino_t_shift = arduino_t_shift(find(arduino_t_shift <= osc_t_shift(end)));
+
+arduino_signal_raw = double(ts2.Data);
 
 ard_signal = zeros(1, size(arduino_signal_raw,3));
 
@@ -20,38 +30,39 @@ for i = 1:size(arduino_signal_raw,3)
     
 end
 
+ard_signal = ard_signal';
+
 % Converter os valores de 12 bits para tensão (0 a 3.3V)
 sinal_arduino_v = (ard_signal ./ 4095) * 3.3; % 4095 é 2^12 - 1
+sinal_arduino_v = sinal_arduino_v(160:end);
+sinal_arduino_v = sinal_arduino_v(find(arduino_t_shift <= osc_t_shift(end)));
 
-% Ajustar o tempo (opcional)
-% Se necessário, alinhe os sinais em tempo
-[tempo_osc, sinal_osc, tempo_arduino, sinal_arduino_v] = alinharSinais(osc_t_raw, osc_signal_raw, arduino_t_raw, sinal_arduino_v);
+% Cálculo de Ganho
+interv1 = intersect(find(2*10^-3 < arduino_t_shift), find(arduino_t_shift <= 0.1)); % intervalo 1 em que ambos os sinais estão em high
+interv2 = intersect(find(202*10^-3 < arduino_t_shift), find(arduino_t_shift <= 0.3)); % intervalo 2 em que ambos os sinais estão em high
+interv3 = intersect(find(402*10^-3 < arduino_t_shift), find(arduino_t_shift <= 0.5)); % intervalo 3 em que ambos os sinais estão em high
 
-% Interpolar os sinais para comparação (mesma base de tempo)
-tempo_comum = linspace(max(tempo_osc(1), tempo_arduino(1)), min(tempo_osc(end), tempo_arduino(end)), 1000);
-sinal_osc_interp = interp1(tempo_osc, sinal_osc, tempo_comum);
-sinal_arduino_interp = interp1(tempo_arduino, sinal_arduino_v, tempo_comum);
+mean_interv1 = mean(sinal_arduino_v(interv1))/mean(osc_signal_shift(interv1));
+mean_interv2 = mean(sinal_arduino_v(interv2))/mean(osc_signal_shift(interv2));
+mean_interv3 = mean(sinal_arduino_v(interv3))/mean(osc_signal_shift(interv3));
 
-% Calcular o ganho (sinal Arduino / sinal Osciloscópio)
-ganho_max = max(sinal_arduino_interp)/ max(sinal_osc_interp);
+mean_gain = (mean_interv1 + mean_interv2 + mean_interv3)/3;
 
-% Plotar os resultados
-subplot(3, 1, 1);
-plot(tempo_comum, sinal_osc_interp, 'b', 'LineWidth', 1.5); 
-hold on;
-plot(tempo_comum, sinal_arduino_interp, 'r--', 'LineWidth', 1.5);
-%xlabel('Tempo (s)');
-ylabel('Amplitude (V)');
-%title(sprintf('Comparação dos Sinais Alinhados no Tempo com Ganho Médio de %3.f', ganho_medio), 'Interpreter', 'none');
-title(['Comparação dos Sinais Alinhados no Tempo com Ganho de ', num2str(ganho_max)])
+% Gráficos 
+subplot(3,1,1);
+plot(osc_t_shift , osc_signal_shift,'b', 'LineWidth', 1.5); 
+hold on 
+plot(arduino_t_shift, sinal_arduino_v, '--r', 'LineWidth', 1.5); 
 legend('Osciloscópio', 'Arduino Due');
+ylabel('Amplitude (V)');
+title(['Comparação dos Sinais Alinhados no Tempo com Ganho de ', num2str(mean_gain), ' V/V'])
+axis([-inf inf -0.1 3.3]);
 grid on;
 
 subplot(3, 1, 2);
-plot(arduino_t_raw, sinal_arduino_v, 'm', 'LineWidth', 1.5);
-%xlabel('Tempo (s)');
-ylabel('Amplitude (V)');
-title('Dados Crus do Arduino Due (V)');
+plot(arduino_t_raw, ard_signal , 'm', 'LineWidth', 1.5);
+ylabel('Amplitude (bits)');
+title('Dados Crus do Arduino Due (bits)');
 grid on;
 
 subplot(3, 1, 3);
@@ -60,16 +71,3 @@ xlabel('Tempo (s)');
 ylabel('Amplitude (V)');
 title('Dados Crus do Osciloscópio (V)');
 grid on;
-
-% Função auxiliar para ajustar os sinais para começar na mesma base de tempo
-function [t1_al, y1_al, t2_al, y2_al] = alinharSinais(t1, y1, t2, y2)
-
-    t_inicio = max(t1(1), t2(1));
-    t_fim = min(t1(end), t2(end));
-    idx1 = (t1 >= t_inicio) & (t1 <= t_fim);
-    idx2 = (t2 >= t_inicio) & (t2 <= t_fim);
-    t1_al = t1(idx1);
-    y1_al = y1(idx1);
-    t2_al = t2(idx2);
-    y2_al = y2(idx2);
-end
