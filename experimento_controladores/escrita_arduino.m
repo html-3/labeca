@@ -16,6 +16,7 @@ osc_signal_shift = osc_signal_shift(find(osc_t_shift<=0.6));
 arduino_data = load('ard_pulse_sent.mat'); 
 
 arduino_data_raw = arduino_data.out.rect_arduino;
+arduino_data_raw = double(arduino_data_raw);
 arduino_t_raw = arduino_data.out.tout;
 
 arduino_t_shift = arduino_t_raw(find(arduino_t_raw>=0.1):end) - arduino_t_raw(find(arduino_t_raw>=0.1, 1, 'first'));
@@ -45,7 +46,7 @@ plot(arduino_t_shift, sinal_arduino_v, '--r', 'LineWidth', 1.5);
 legend('Osciloscópio', 'Arduino Due');
 ylabel('Amplitude (V)');
 %title(['Comparação dos Sinais Alinhados no Tempo com Ganho de ', num2str(mean_gain), ' V/V'])
-axis([-inf inf -0.1 3.3]);
+axis([-inf inf -0.1 3.5]);
 grid on;
 
 subplot(3, 1, 2);
