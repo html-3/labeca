@@ -1,0 +1,11 @@
+rtGetNaN.o: \
+ C:/Users/Guilherme/Documents/UFRJ/2024.2/LABECA/labeca/experimento_controladores/Projeto_Controlador_PI_21_a_ert_rtw/rtGetNaN.c \
+ C:/Users/Guilherme/Documents/UFRJ/2024.2/LABECA/labeca/experimento_controladores/Projeto_Controlador_PI_21_a_ert_rtw/rtwtypes.h \
+ C:/Users/Guilherme/Documents/UFRJ/2024.2/LABECA/labeca/experimento_controladores/Projeto_Controlador_PI_21_a_ert_rtw/rtGetNaN.h \
+ C:/Users/Guilherme/Documents/UFRJ/2024.2/LABECA/labeca/experimento_controladores/Projeto_Controlador_PI_21_a_ert_rtw/rt_nonfinite.h
+
+C:/Users/Guilherme/Documents/UFRJ/2024.2/LABECA/labeca/experimento_controladores/Projeto_Controlador_PI_21_a_ert_rtw/rtwtypes.h:
+
+C:/Users/Guilherme/Documents/UFRJ/2024.2/LABECA/labeca/experimento_controladores/Projeto_Controlador_PI_21_a_ert_rtw/rtGetNaN.h:
+
+C:/Users/Guilherme/Documents/UFRJ/2024.2/LABECA/labeca/experimento_controladores/Projeto_Controlador_PI_21_a_ert_rtw/rt_nonfinite.h:

@@ -1,4 +1,0 @@
-LIBRARY arduino_write_cgxe.mexw64
-EXPORTS
-mexFunction
-mexfilerequiredapiversion
