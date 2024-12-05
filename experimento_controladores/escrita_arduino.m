@@ -26,6 +26,16 @@ arduino_t_shift = arduino_t_shift(find(arduino_t_shift <= osc_t_shift(end)));
 sinal_arduino_v_raw = (arduino_data_raw ./ 4095) * 3.3; % 4095 é 2^12 - 1
 sinal_arduino_v = sinal_arduino_v_raw(find(arduino_t_raw>=0.1):end);
 sinal_arduino_v = sinal_arduino_v(find(arduino_t_shift <= osc_t_shift(end)));
+
+diff_min = min(sinal_arduino_v) - min(osc_signal_shift); % -0.5424 -> isso é uma zona morta?
+diff_max = max(sinal_arduino_v) - max(osc_signal_shift); % 0.5099
+
+ganho = diff_max/diff_min;
+
+% Precisamos saber a partir de quantos bits começa a gerar sinal no
+% osciloscópio, e qual o último valor de bit que o osciloscópio para de
+% ler, isso é para determinar a zona morta e a de saturação
+
 % 
 % % Cálculo de Ganho
 % interv1 = intersect(find(2*10^-3 < arduino_t_shift), find(arduino_t_shift <= 0.1)); % intervalo 1 em que ambos os sinais estão em high
@@ -45,14 +55,14 @@ hold on
 plot(arduino_t_shift, sinal_arduino_v, '--r', 'LineWidth', 1.5); 
 legend('Osciloscópio', 'Arduino Due');
 ylabel('Amplitude (V)');
-%title(['Comparação dos Sinais Alinhados no Tempo com Ganho de ', num2str(mean_gain), ' V/V'])
+title(['Comparação dos Sinais Alinhados no Tempo com Ganho de ', num2str(ganho), ' V/V'])
 axis([-inf inf -0.1 3.5]);
 grid on;
 
 subplot(3, 1, 2);
-plot(arduino_t_raw, sinal_arduino_v_raw , 'm', 'LineWidth', 1.5);
-ylabel('Amplitude (bits)');
-title('Dados Crus do Arduino Due (bits)');
+plot(arduino_t_raw, arduino_data_raw , 'm', 'LineWidth', 1.5);
+ylabel('Amplitude');
+title('Dados Crus do Arduino Due (níveis)');
 grid on;
 
 subplot(3, 1, 3);
