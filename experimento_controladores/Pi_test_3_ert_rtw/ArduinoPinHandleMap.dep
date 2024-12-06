@@ -1,0 +1,11 @@
+ArduinoPinHandleMap.o: \
+ C:/ProgramData/MATLAB/SupportPackages/R2021a/toolbox/target/supportpackages/arduinobase/src/ArduinoPinHandleMap.cpp \
+ D:/1_UFRJ/2024.2/labeca/labeca/experimento_controladores/Pi_test_3_ert_rtw/rtwtypes.h \
+ D:/1_UFRJ/2024.2/labeca/labeca/experimento_controladores/Pi_test_3_ert_rtw/__cf_Pi_test_3.h \
+ C:/PROGRA~1/POLYSP~1/R2021a/extern/include/tmwtypes.h
+
+D:/1_UFRJ/2024.2/labeca/labeca/experimento_controladores/Pi_test_3_ert_rtw/rtwtypes.h:
+
+D:/1_UFRJ/2024.2/labeca/labeca/experimento_controladores/Pi_test_3_ert_rtw/__cf_Pi_test_3.h:
+
+C:/PROGRA~1/POLYSP~1/R2021a/extern/include/tmwtypes.h:
