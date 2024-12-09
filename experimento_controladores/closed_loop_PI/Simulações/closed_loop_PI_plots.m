@@ -10,9 +10,9 @@ error = 10 - vt;
 
 % Plots do simulink
 figure(1)
-title('Vt,Vt_ref x T');
 plot(out.vt.Time, out.vt.Data, out.vt_ref.Time, out.vt_ref.Data);
+title('Vt,Vt_{ref} x T');
 xlabel('Tempo(s)');
 legend('Resposta do sistema', 'Entrada Degrau de Referência');
-ylabel('Vt,Vt_ref');
+ylabel('Vt,Vt_{ref}');
 grid on;

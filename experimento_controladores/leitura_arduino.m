@@ -61,8 +61,8 @@ grid on;
 
 subplot(3, 1, 2);
 plot(arduino_t_raw, ard_signal , 'm', 'LineWidth', 1.5);
-ylabel('Amplitude (bits)');
-title('Dados Crus do Arduino Due (bits)');
+ylabel('Amplitude');
+title('Dados Crus do Arduino Due (níveis)');
 grid on;
 
 subplot(3, 1, 3);
