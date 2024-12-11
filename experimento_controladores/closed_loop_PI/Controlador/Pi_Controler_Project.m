@@ -4,9 +4,9 @@ origin = find(tacometer.signals.values(1,1:end)' > 1500,1);
 
 % Plot do sinal de referência e sinal de resposta
 figure(1)
-plot(tacometer.time(origin:end/5), 5*2.795*tacometer.signals.values(1,origin:end/5)/(4095))
+plot(tacometer.time(origin:floor(end/5)), 5*2.795*tacometer.signals.values(1,origin:floor(end/5))/(4095));
 hold on;
-plot(reference.time(origin:end/5), 5*2.795*reference.signals.values(origin:end/5)/(4095));
+plot(reference.time(origin:floor(end/5)), 5*2.795*reference.signals.values(origin:floor(end/5))/(4095));
 title('Entrada/Saída x Tempo');
 legend('Sinal de Resposta', 'Sinal de Referência')
 xlabel('Tempo(s)');
@@ -14,8 +14,7 @@ ylabel('Sinais de Referência e Resposta(V)');
 grid on;
 
 % Plot do sinal de controle
-figure(2)
-plot(control.time(1:end/5), 5*2.795*control.signals.values(1,1:end/5)/(4095))
+figure(2);plot(control.time(1:floor(end/5)), 5*2.795*control.signals.values(1,1:floor(end/5))/(4095));
 title('Controle x Tempo');
 xlabel('Tempo(s)');
 ylabel('Sinais de Controle(V)');
