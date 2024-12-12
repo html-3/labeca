@@ -69,13 +69,29 @@ if unco == 0 && unobsv == 0
     end
   
   %% Projeto do observador
-  
+    
+    b_cl = [0; 0; 1];
+    c_cl = [c 0];
+    [numerador,denominador] = ss2tf(A_cl_1,b_cl,c_cl,0);
+    sys = tf(numerador,denominador);
+    
+    % https://www.mathworks.com/help/ident/ref/stepdataoptions.html
+    % Zona linear: 4.55V a 14.99V
+    % Config = RespConfig(Bias=5,Amplitude=8,Delay=0); % disponível p/ versões posteriores a 2023a
+    opt = stepDataOptions('InputOffset',5,'StepAmplitude',8);
+    
+    figure(1)
+    step(sys,opt)
+    sys_info = stepinfo(sys);
+    % Tempo de acomodação da resposta do sistema em malha fechada com PI robusto
+    tss = sys_info.SettlingTime
+    
     % Tempo de acomodação da resposta do sistema em malha fechada com PI
-    load('labeca\experimento_controladores\Carolina_dados_PI\control.mat');
-    load('labeca\experimento_controladores\Carolina_dados_PI\reference.mat');
-    load('labeca\experimento_controladores\Carolina_dados_PI\tacometer.mat');
-    [tss, ~] = Pi_Controler_Project(control,reference,tacometer);
-    close all
+%     load('labeca\experimento_controladores\Carolina_dados_PI\control.mat');
+%     load('labeca\experimento_controladores\Carolina_dados_PI\reference.mat');
+%     load('labeca\experimento_controladores\Carolina_dados_PI\tacometer.mat');
+%     [tss, ~] = Pi_Controler_Project(control,reference,tacometer);
+%     close all
 
     csi = 1; % criticamente amortecido(sem overshoot, para não haver risco de sair da zona linear)
     wn = 4/(tss*csi);
@@ -91,6 +107,19 @@ if unco == 0 && unobsv == 0
 
     sol = solve(pol_desejado(2) == coeff(2), pol_desejado(3) == coeff(3));
     l = double([sol.l_1;sol.l_2]);
+    
+    % Testando se a dinâmica do observador é realmente mais rápida que a do
+    % sistema com o controle PI
+    A_obs = A-l*c;
+    [num_obs,den_obs] = ss2tf(A_obs,b,c,0);
+    sys_obs = tf(num_obs,den_obs);
+    
+    figure(2)
+    step(sys_obs,opt)
+    sys_obs_info = stepinfo(sys_obs);
+    tss_obs = sys_obs_info.SettlingTime
+ 
+ %% Juntando o controle realimentado robusto com o observador 
 
     % A dimensão da matriz A é de 2x2, e b*k' é 2x2, logo (A - b*k') é 2x2
     % A dimensão de ki_1*b é 2x1, e a de c é 1x2
@@ -102,7 +131,18 @@ if unco == 0 && unobsv == 0
     % Matriz ampliada com o integrador e observador:
     A_cl_obs = [A_cl_1; zeros(2,3)];
     vetor_obs = [b*k'; 0 0; A-l*c];
-    A_obs = [A_cl_obs vetor_obs];
-    eig_A_obs = eig(A_obs)
+    A_full = [A_cl_obs vetor_obs];
+    eig_A_full = eig(A_full);
+    
+    b_full = [0 0 1 0 0]';
+    c_full = [c 0 0 0];
+    
+    [num_full,den_full] = ss2tf(A_full,b_full,c_full,0);
+    sys_full = tf(num_full,den_full);
+    
+    figure(3)
+    step(sys_full,opt)
+    sys_full_info = stepinfo(sys_full);
+    tss_full = sys_full_info.SettlingTime
 
 end
