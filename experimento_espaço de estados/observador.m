@@ -67,8 +67,6 @@ if unco == 0 && unobsv == 0
     else
         disp('Não foi encontrado nenhum valor de ki que satisfaça a condição. \n');
     end
-  
-  %% Projeto do observador
     
     b_cl = [0; 0; 1];
     c_cl = [c 0];
@@ -85,13 +83,8 @@ if unco == 0 && unobsv == 0
     sys_info = stepinfo(sys);
     % Tempo de acomodação da resposta do sistema em malha fechada com PI robusto
     tss = sys_info.SettlingTime
-    
-    % Tempo de acomodação da resposta do sistema em malha fechada com PI
-%     load('labeca\experimento_controladores\Carolina_dados_PI\control.mat');
-%     load('labeca\experimento_controladores\Carolina_dados_PI\reference.mat');
-%     load('labeca\experimento_controladores\Carolina_dados_PI\tacometer.mat');
-%     [tss, ~] = Pi_Controler_Project(control,reference,tacometer);
-%     close all
+
+    %% Projeto do observador
 
     csi = 1; % criticamente amortecido(sem overshoot, para não haver risco de sair da zona linear)
     wn = 4/(tss*csi);
@@ -111,14 +104,14 @@ if unco == 0 && unobsv == 0
     % Testando se a dinâmica do observador é realmente mais rápida que a do
     % sistema com o controle PI
     A_obs = A-l*c;
-    [num_obs,den_obs] = ss2tf(A_obs,b,c,0);
+    [num_obs,den_obs] = ss2tf(A_obs,[0;0],c,0);
     sys_obs = tf(num_obs,den_obs);
-    
+
     figure(2)
-    step(sys_obs,opt)
+    step(sys_obs,[0 1],opt)
     sys_obs_info = stepinfo(sys_obs);
     tss_obs = sys_obs_info.SettlingTime
- 
+
  %% Juntando o controle realimentado robusto com o observador 
 
     % A dimensão da matriz A é de 2x2, e b*k' é 2x2, logo (A - b*k') é 2x2
@@ -127,19 +120,19 @@ if unco == 0 && unobsv == 0
     % Se A é 2x2, então (A-l*c) também precisa ser 2x2, portanto, 'l' deve ser 2x1, e seguindo a eq. 5.35
     % da apostila de 2008 (pg 71), precisa ter um vetor linha de zeros abaixo
     % de b*k', logo esse vetor tem tamanho 1x2, assim, tem-se:
-    
+
     % Matriz ampliada com o integrador e observador:
     A_cl_obs = [A_cl_1; zeros(2,3)];
-    vetor_obs = [b*k'; 0 0; A-l*c];
+    vetor_obs = [b*k'; 0 0; A-l.*c];
     A_full = [A_cl_obs vetor_obs];
     eig_A_full = eig(A_full);
-    
+
     b_full = [0 0 1 0 0]';
     c_full = [c 0 0 0];
-    
+
     [num_full,den_full] = ss2tf(A_full,b_full,c_full,0);
     sys_full = tf(num_full,den_full);
-    
+
     figure(3)
     step(sys_full,opt)
     sys_full_info = stepinfo(sys_full);
