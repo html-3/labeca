@@ -23,10 +23,15 @@ if unco == 0 && unobsv == 0
     
     % Testando se a planta tem zeros na origem
     [num,den] = ss2tf(A,b,c,0); % calcula a função de transferência
+    sys_origin = tf(num,den)
 
     %% Rastreamento robusto com realimentação de estados e de saída
-    P = [-150 -5]; % eig(A) = -288.2302; -13.8708
-    k = place(A,b,P)'; % Ganhos de realimentação de estados
+    
+    disp('Polos do sistema sem controle: ');
+    disp(eig(A));
+    
+    P = [-290 -50]; % eig(A) = -288.2302; -13.8708
+    k = place(A,b,P)' % Ganhos de realimentação de estados
 %     ki = 1;
 %     A_cl = [A-b*k' ki*b;
 %                 -c      0];
@@ -70,15 +75,17 @@ if unco == 0 && unobsv == 0
     
     b_cl = [0; 0; 1];
     c_cl = [c 0];
-    [numerador,denominador] = ss2tf(A_cl_1,b_cl,c_cl,0);
+    [numerador,denominador] = ss2tf(A_cl_end,b_cl,c_cl,0);
     sys = tf(numerador,denominador);
+    figure(1);
+    rlocus(sys);
     
     % https://www.mathworks.com/help/ident/ref/stepdataoptions.html
     % Zona linear: 4.55V a 14.99V
     % Config = RespConfig(Bias=5,Amplitude=8,Delay=0); % disponível p/ versões posteriores a 2023a
     opt = stepDataOptions('InputOffset',5,'StepAmplitude',8);
     
-    figure(1)
+    figure(2)
     step(sys,opt)
     sys_info = stepinfo(sys);
     % Tempo de acomodação da resposta do sistema em malha fechada com PI robusto
@@ -107,10 +114,13 @@ if unco == 0 && unobsv == 0
     [num_obs,den_obs] = ss2tf(A_obs,[0;0],c,0);
     sys_obs = tf(num_obs,den_obs);
 
-    figure(2)
-    step(sys_obs,[0 1],opt)
-    sys_obs_info = stepinfo(sys_obs);
-    tss_obs = sys_obs_info.SettlingTime
+    figure(3)
+    x0 = [0 ; 2];
+    initial(ss(A_obs,[0;0], c, 0), x0)
+    
+%     step(sys_obs, x0, opt)
+%     sys_obs_info = stepinfo(sys_obs);
+%     tss_obs = sys_obs_info.SettlingTime
 
  %% Juntando o controle realimentado robusto com o observador 
 
@@ -122,8 +132,8 @@ if unco == 0 && unobsv == 0
     % de b*k', logo esse vetor tem tamanho 1x2, assim, tem-se:
 
     % Matriz ampliada com o integrador e observador:
-    A_cl_obs = [A_cl_1; zeros(2,3)];
-    vetor_obs = [b*k'; 0 0; A-l.*c];
+    A_cl_obs = [A_cl_end; zeros(2,3)];
+    vetor_obs = [b*k'; 0 0; A-l*c];
     A_full = [A_cl_obs vetor_obs];
     eig_A_full = eig(A_full);
 
@@ -133,7 +143,7 @@ if unco == 0 && unobsv == 0
     [num_full,den_full] = ss2tf(A_full,b_full,c_full,0);
     sys_full = tf(num_full,den_full);
 
-    figure(3)
+    figure(4)
     step(sys_full,opt)
     sys_full_info = stepinfo(sys_full);
     tss_full = sys_full_info.SettlingTime
