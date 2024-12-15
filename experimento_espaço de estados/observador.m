@@ -1,5 +1,10 @@
 clear all
 
+% PROJETAR PENSANDO EM 5% OVERSHOOT SUBAMORTECIDO, E DEPOIS PROJETAR PRA
+% SER CRITICAMENTE AMORTECIDO
+% DEPOIS, FAZER O SIMULINK DO PRÓXIMO EXPERIMENTO DO OBSERVADOR, USING
+% EMBED SYSTEM
+
 [Ra, La, f, J, t, va, vt, ia, Kt, Kg, Ka] = electrical_mechanical_parameters('buslin01.csv');
 
 %% Modelagem do motor cc por um modelo de 2ª ordem
@@ -30,11 +35,37 @@ if unco == 0 && unobsv == 0
     disp('Polos do sistema sem controle: ');
     disp(eig(A));
     
+    % PARTE Q PRECISA SER ANALISADA: A RESPOSTA TA DANDO UM OVERSHOOT
+    % HORROROSO
+%     PO = 5; % 5% de overshoot
+%     csi_cl = abs(log(PO/100))/sqrt(pi^2 + log(PO/100)^2);
+%     
+%     load('labeca\experimento_controladores\Carolina_dados_PI\control.mat');
+%     load('labeca\experimento_controladores\Carolina_dados_PI\reference.mat');
+%     load('labeca\experimento_controladores\Carolina_dados_PI\tacometer.mat');
+%     [tss_cl, ~] = Pi_Controler_Project(control,reference,tacometer)
+%     close all
+%     
+%     wn_cl = 4/(tss_cl*csi_cl*1.5);
+% 
+%     pol_des_cl = [1, 2*csi_cl*wn_cl, wn_cl^2];
+% 
     P = [-290 -50]; % eig(A) = -288.2302; -13.8708
-    k = place(A,b,P)' % Ganhos de realimentação de estados
-%     ki = 1;
-%     A_cl = [A-b*k' ki*b;
-%                 -c      0];
+    pol_des_cl = [1, -1*(P(1)+P(2)), P(1)*P(2)];
+    
+    syms s k1 k2
+    k = [k1;k2];
+    pol_caract = det((A-b*k') - s*eye(2,2));
+    coeff_cl = coeffs(pol_caract, s, 'All');
+
+    sol = solve(pol_des_cl(2) == coeff_cl(2), pol_des_cl(3) == coeff_cl(3));
+    k = double([sol.k1;sol.k2]);
+    
+    disp('Ganhos k calculados: ');
+    disp(k);
+    
+    disp('Polos realocados: ');
+    disp(eig(A-b*k'));
     
     % Iterar sobre valores de ki para garantir que autovalores tenham parte real negativa
     ki_range = -1:0.1:100; % Intervalo de valores de ki
@@ -56,17 +87,17 @@ if unco == 0 && unobsv == 0
     
     if ~isempty(valid_ki)
         
-        fprintf('Intervalo de valores de ki que satisfazem a condição: [%.2f, %.2f] \n', valid_ki(1), valid_ki(end));
+        fprintf('Intervalo de valores de ki que satisfazem a condição: [%.2f, %.2f]', valid_ki(1), valid_ki(end));
         
         ki_1 = valid_ki(1);
-        ki_end = valid_ki(end);
+        ki_end = valid_ki(750);
         
         A_cl_1 = [A-b*k' ki_1*b; -c  0];
         A_cl_end = [A-b*k' ki_end*b; -c  0];
         
         fprintf('Para ki %.2f, tem-se que os autovalores de A_cl são: \n', valid_ki(1))
         display(eig(A_cl_1))
-        fprintf('\nE para o 2° valor de ki como %.2f, os autovalores são: \n', valid_ki(end))
+        fprintf('\nE para o 2° valor de ki como %.2f, os autovalores são: \n', valid_ki(750))
         display(eig(A_cl_end))
         
     else
@@ -75,8 +106,10 @@ if unco == 0 && unobsv == 0
     
     b_cl = [0; 0; 1];
     c_cl = [c 0];
-    [numerador,denominador] = ss2tf(A_cl_end,b_cl,c_cl,0);
-    sys = tf(numerador,denominador);
+    [numerador,denominador] = ss2tf(A_cl_end,b_cl,c_cl,0); % MUDEI AQUI OH
+    disp('Função de Transferência do controle de malha fechada: ');
+    sys = tf(numerador,denominador)
+    
     figure(1);
     rlocus(sys);
     
@@ -92,7 +125,7 @@ if unco == 0 && unobsv == 0
     tss = sys_info.SettlingTime
 
     %% Projeto do observador
-
+  
     csi = 1; % criticamente amortecido(sem overshoot, para não haver risco de sair da zona linear)
     wn = 4/(tss*csi);
     wn_observador = 5*wn; % 5 vezes maior para ser mais rápido e não interferir  no sistema
@@ -109,14 +142,14 @@ if unco == 0 && unobsv == 0
     l = double([sol.l_1;sol.l_2]);
     
     % Testando se a dinâmica do observador é realmente mais rápida que a do
-    % sistema com o controle PI
-    A_obs = A-l*c;
-    [num_obs,den_obs] = ss2tf(A_obs,[0;0],c,0);
-    sys_obs = tf(num_obs,den_obs);
-
-    figure(3)
-    x0 = [0 ; 2];
-    initial(ss(A_obs,[0;0], c, 0), x0)
+    % sistema com o controle PI (NÃO CREIO Q ESSA PARTE SEJA REALMENTE NECESSÁRIA)
+%     A_obs = A-l*c;
+%     [num_obs,den_obs] = ss2tf(A_obs,[0;0],c,0);
+%     sys_obs = tf(num_obs,den_obs);
+% 
+%     figure(3)
+%     x0 = [0 ; 2];
+%     initial(ss(A_obs,[0;0], c, 0), x0)
     
 %     step(sys_obs, x0, opt)
 %     sys_obs_info = stepinfo(sys_obs);
@@ -132,7 +165,7 @@ if unco == 0 && unobsv == 0
     % de b*k', logo esse vetor tem tamanho 1x2, assim, tem-se:
 
     % Matriz ampliada com o integrador e observador:
-    A_cl_obs = [A_cl_end; zeros(2,3)];
+    A_cl_obs = [A_cl_end; zeros(2,3)]; % AQUI TB
     vetor_obs = [b*k'; 0 0; A-l*c];
     A_full = [A_cl_obs vetor_obs];
     eig_A_full = eig(A_full);
@@ -143,7 +176,7 @@ if unco == 0 && unobsv == 0
     [num_full,den_full] = ss2tf(A_full,b_full,c_full,0);
     sys_full = tf(num_full,den_full);
 
-    figure(4)
+    figure(3)
     step(sys_full,opt)
     sys_full_info = stepinfo(sys_full);
     tss_full = sys_full_info.SettlingTime
