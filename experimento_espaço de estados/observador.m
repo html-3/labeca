@@ -11,9 +11,9 @@ clear all
 % dx/dt = [di_a/dt dv_t/dt]
 
 A = [-Ra/La -Kg/(Kt*La);
-     Ka*Kt/J -f/J];
+     Ka*Kt/J -f/J]
 
-b = [1/La ; 0];
+b = [1/La ; 0]
 c = [0 1]; % tensão
 
 % Testando se o par A,b é controlável
@@ -50,7 +50,7 @@ if unco == 0 && unobsv == 0
 % 
 %     pol_des_cl = [1, 2*csi_cl*wn_cl, wn_cl^2];
 % 
-    P = [-290 -50]; % eig(A) = -288.2302; -13.8708
+    P = [-290 -40]; % eig(A) = -288.2302; -13.8708
     pol_des_cl = [1, -1*(P(1)+P(2)), P(1)*P(2)];
     
     syms s k1 k2
@@ -140,6 +140,9 @@ if unco == 0 && unobsv == 0
 
     sol = solve(pol_desejado(2) == coeff(2), pol_desejado(3) == coeff(3));
     l = double([sol.l_1;sol.l_2]);
+    
+    disp('Ganhos L do observador: ');
+    disp(l);
     
     % Testando se a dinâmica do observador é realmente mais rápida que a do
     % sistema com o controle PI (NÃO CREIO Q ESSA PARTE SEJA REALMENTE NECESSÁRIA)

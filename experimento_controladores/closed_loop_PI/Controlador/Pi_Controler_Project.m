@@ -1,4 +1,8 @@
-function [t_acommod, error] = Pi_Controler_Project(control,reference,tacometer)
+function [t_acommod, error] = Pi_Controler_Project()
+
+load('labeca\experimento_controladores\Carolina_dados_PI\control.mat');
+load('labeca\experimento_controladores\Carolina_dados_PI\reference.mat');
+load('labeca\experimento_controladores\Carolina_dados_PI\tacometer.mat');
 
 origin = find(tacometer.signals.values(1,1:end)' > 1500,1);
 
