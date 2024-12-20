@@ -4,6 +4,8 @@
 %% Construção Observador de estados
 
 % Definição das matrizes
+
+
 A_mod = [-Ra/La, -Kg/(La*Kt*Kd2*Ki);
      Kt*Ka/J, -f/(J*Kd2*Ki)];
 B_mod = [1/(La*Kd1*Ko); 0];
@@ -81,7 +83,7 @@ det_A_r = collect(det(s*eye(size(A_r))-A_r));
 coeffs_det_A_r = coeffs(det_A_r, s)
 
 % Alocação de polos
-desired_poles1 = [poles_system(2), poles_system(2), poles_system(1)]
+desired_poles1 = [poles_system(2)+j*poles_system(2), poles_system(2)-j*poles_system(2), poles_system(1)]
 
 pol_caract = poly(desired_poles1)
 

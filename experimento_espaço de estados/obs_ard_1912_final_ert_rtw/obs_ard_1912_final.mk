@@ -2,7 +2,7 @@
 ## Makefile generated for component 'obs_ard_1912_final'. 
 ## 
 ## Makefile     : obs_ard_1912_final.mk
-## Generated on : Thu Dec 19 16:27:29 2024
+## Generated on : Thu Dec 19 17:43:19 2024
 ## Final product: $(RELATIVE_PATH_TO_ANCHOR)/obs_ard_1912_final.elf
 ## Product type : executable
 ## 
