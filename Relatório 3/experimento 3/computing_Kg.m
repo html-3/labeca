@@ -1,0 +1,12 @@
+function [Kg] = computing_Kg(filename)
+    % Na seção 4.2 do artigo no classroom:
+    % E = (Kg/Kt)*Vt, em que Km é a cte de torque, e Kg é cte de força contra-eletromotriz
+    % Va aprox E, because there is no load connected to the armature circuit
+    % Therefore, Va = (Kg/Kt)Vt
+    
+    [Kt, ~, ~] = get_Kt(filename); % w é a velocidade de rotação do motor (rad/s) medida no 1º experimento
+    [K_barra, ~, ~] = get_K('dados.csv'); % K_degrau = 1.3897, e é do 2º experimento
+    Kg = Kt/K_barra;
+end
+
+
