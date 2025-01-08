@@ -4,7 +4,7 @@
 
 ## Membros
 
-Caronlina Segundo
+Carolina Segundo
 
 Guilherme Matera
 
